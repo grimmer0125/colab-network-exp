@@ -40,6 +40,9 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
 from keras.layers import Dropout, Flatten, Dense
 from keras import applications
+import matplotlib
+matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
 
 # dimensions of our images.
 img_width, img_height = 150, 150
@@ -49,8 +52,9 @@ train_data_dir = 'data/train'
 validation_data_dir = 'data/validation'
 nb_train_samples = 2000
 nb_validation_samples = 800
-epochs = 50
+epochs = 20
 batch_size = 16
+train_history = None 
 
 def save_bottleneck_features():
     datagen = ImageDataGenerator(rescale=1. / 255)
@@ -78,7 +82,6 @@ def save_bottleneck_features():
         generator, nb_validation_samples // batch_size)
     np.save('bottleneck_features_validation.npy',bottleneck_features_validation)
 
-
 def train_top_model():
     train_data = np.load('bottleneck_features_train.npy')
     train_labels = np.array([0] * (nb_train_samples // 2) + [1] * (nb_train_samples // 2))
@@ -96,10 +99,14 @@ def train_top_model():
     model.compile(optimizer='rmsprop',
                   loss='binary_crossentropy', metrics=['accuracy'])
 
-    model.fit(train_data, train_labels,
+    global train_history
+    train_history = model.fit(train_data, train_labels,
               epochs=epochs,
               batch_size=batch_size,
               validation_data=(validation_data, validation_labels))
+    show_train_history(train_history,'acc','val_acc')     
+    show_train_history(train_history,'loss','val_loss')              
+         
     model.save_weights(top_model_weights_path)
 
 def predict():
@@ -131,6 +138,19 @@ def predict():
     probs = model.predict(x) 
     print("get prediction:{}".format(probs))
 
+def show_train_history(train_history,train,validation):
+    plt.plot(train_history.history[train])
+    plt.plot(train_history.history[validation])
+    plt.title('Train History')
+    plt.ylabel(train)
+    plt.xlabel('Epoch')
+    plt.legend(['train', 'validation'], loc='upper left')
+    try:
+        plt.show(block=True)
+    except:
+        print("plot exception")    
+
 # save_bottleneck_features()
-# train_top_model()
-predict()
+train_top_model()
+# predict()
+print("done")
