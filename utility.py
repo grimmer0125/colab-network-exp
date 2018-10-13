@@ -1,7 +1,4 @@
 import matplotlib
-if is_notebook() == False:
-    matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
 
 def is_notebook():
     try:
@@ -15,6 +12,10 @@ def is_notebook():
             return False  # Other type (?)
     except NameError:
         return False
+
+if is_notebook() == False:
+    matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
 
 def show_train_history(train_history,train,validation):
     plt.plot(train_history.history[train])
