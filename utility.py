@@ -1,3 +1,8 @@
+import matplotlib
+if is_notebook() == False:
+    matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
+
 def is_notebook():
     try:
         shell = get_ipython().__class__.__name__
@@ -10,3 +15,15 @@ def is_notebook():
             return False  # Other type (?)
     except NameError:
         return False
+
+def show_train_history(train_history,train,validation):
+    plt.plot(train_history.history[train])
+    plt.plot(train_history.history[validation])
+    plt.title('Train History')
+    plt.ylabel(train)
+    plt.xlabel('Epoch')
+    plt.legend(['train', 'validation'], loc='upper left')
+    try:
+        plt.show(block=True)
+    except:
+        print("plot exception")    

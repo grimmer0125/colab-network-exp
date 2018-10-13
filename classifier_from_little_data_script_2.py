@@ -40,13 +40,8 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
 from keras.layers import Dropout, Flatten, Dense
 from keras import applications
-import matplotlib
 
-from utility import is_notebook
-
-if is_notebook() == False:
-    matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
+from utility import show_train_history
 
 # dimensions of our images.
 img_width, img_height = 150, 150
@@ -141,18 +136,6 @@ def predict():
     # [0] for cat, [1] for dog. output is single neuron since Dense(1
     probs = model.predict(x) 
     print("get prediction:{}".format(probs))
-
-def show_train_history(train_history,train,validation):
-    plt.plot(train_history.history[train])
-    plt.plot(train_history.history[validation])
-    plt.title('Train History')
-    plt.ylabel(train)
-    plt.xlabel('Epoch')
-    plt.legend(['train', 'validation'], loc='upper left')
-    try:
-        plt.show(block=True)
-    except:
-        print("plot exception")    
 
 def main():
     # save_bottleneck_features()
