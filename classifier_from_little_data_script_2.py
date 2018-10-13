@@ -41,7 +41,11 @@ from keras.models import Sequential
 from keras.layers import Dropout, Flatten, Dense
 from keras import applications
 import matplotlib
-matplotlib.use('TkAgg')
+
+from utility import is_notebook
+
+if is_notebook() == False:
+    matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 # dimensions of our images.
@@ -150,7 +154,15 @@ def show_train_history(train_history,train,validation):
     except:
         print("plot exception")    
 
-# save_bottleneck_features()
-train_top_model()
-# predict()
-print("done")
+def main():
+    # save_bottleneck_features()
+    train_top_model()
+    # predict()
+    print("done")    
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("KeyboardInterrupt")
+
