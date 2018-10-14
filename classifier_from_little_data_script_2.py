@@ -40,6 +40,8 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
 from keras.layers import Dropout, Flatten, Dense
 from keras import applications
+from keras.preprocessing import image
+from keras.models import Model
 
 from utility import show_train_history
 
@@ -89,7 +91,6 @@ def train_top_model():
     validation_labels = np.array([0] * (nb_validation_samples // 2) + [1] * (nb_validation_samples // 2))
 
     model = Sequential()
-    # input_shape=(150,150,3
     model.add(Flatten(input_shape=train_data.shape[1:]))
     model.add(Dense(256, activation='relu'))
     model.add(Dropout(0.5))
@@ -109,11 +110,9 @@ def train_top_model():
     model.save_weights(top_model_weights_path)
 
 def predict():
-    from keras.preprocessing import image
     # from keras.applications.vgg16 import preprocess_input, decode_predictions
 
     # copy from classifier_from_little_data_script_3
-    from keras.models import Model
     base_model = applications.VGG16(weights='imagenet', include_top=False, input_shape=(150,150,3))
     top_model = Sequential()
     top_model.add(Flatten(input_shape=base_model.output_shape[1:]))
