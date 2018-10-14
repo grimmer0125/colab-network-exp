@@ -1,5 +1,4 @@
 import matplotlib
-import matplotlib.pyplot as plt
 
 def is_notebook():
     try:
@@ -9,13 +8,15 @@ def is_notebook():
             return True   # common Jupyter notebook or qtconsole
         elif shell == 'TerminalInteractiveShell':
             return False  # Terminal running IPython
-        elif shell == 'Shell' # Google's colab. # class: google.colab._shell
+        elif shell == 'Shell': # Google's colab. # class: google.colab._shell
             return False  # Other type (?)
     except NameError:
         return False
 
 if is_notebook() == False:
     matplotlib.use('TkAgg')
+    
+import matplotlib.pyplot as plt
 
 def show_train_history(train_history,train,validation):
     plt.plot(train_history.history[train])
