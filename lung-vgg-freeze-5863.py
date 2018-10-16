@@ -19,24 +19,24 @@ import os
 from pathlib import Path
 
 # %matplotlib inline
-from utility import show_train_history
+# from utility import show_train_history
 import time
 
 # data path
-data_dir = Path('./chest_xray/')
+data_dir = Path('./chest_xray-100/')
 train_dir = data_dir / 'train'
 val_dir = data_dir / 'val'
 test_dir = data_dir / 'test'
-train_features_path = 'lung_bottleneck_features_train.npy'
-val_features_path = 'lung_bottleneck_features_validation.npy'
-top_model_weights_path = 'lung_bottleneck_fc_model.h5'
+train_features_path = 'lung_bottleneck_features_train-100.npy'
+val_features_path = 'lung_bottleneck_features_validation-100.npy'
+top_model_weights_path = 'lung_bottleneck_fc_model-100.h5'
 
 img_width, img_height = 150,150
 epochs = 10
 batch_size = 16
-nb_train_samples =  4126 # 1000 (normal) + 3216 train_data.shape[0] 5216
-nb_validation_samples = 868 # 294 + 572 # val_data.shape[0] 16
-nb_test_samples = 864 # 289+575
+nb_train_samples =  96 # 4126 # 1000 (normal) + 3216 train_data.shape[0] 5216
+nb_validation_samples = 32 # 868 # 294 + 572 # val_data.shape[0] 16
+nb_test_samples = 32 #864 # 289+575
 
 # def explore_image():
 #     import matplotlib.pyplot as plt 
