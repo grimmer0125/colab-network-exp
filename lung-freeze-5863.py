@@ -34,8 +34,10 @@ test_dir = data_dir / 'test'
 train_features_path = 'lung_bottleneck_features_train.npy'
 val_features_path = 'lung_bottleneck_features_validation.npy'
 top_model_weights_path = 'lung_bottleneck_fc_model.h5'
+model_weights_path = 'lung_model.h5'
 
-full_train_feature = ""
+# offline bottleneck conv features
+full_train_feature = "" 
 full_val_feature = ""
 
 img_width, img_height = 150,150 # 224, 224 (default imagenet size)
@@ -158,7 +160,7 @@ def load_model(use_self_trained_weight=False):
         if use_self_trained_weight and os.path.isfile(full_top_model_weight):            
             top_model.load_weights(full_top_model_weight)
 
-        model = Model(inputs=base_model.input, outputs=top_model(base_model.output))    
+        model = Model(inputs=base_model.input, outputs=top_model(base_model.output))  
     elif g_model == MODEL_RESNET:
         # TODO: add resnet 
         # no use save_bottlebeck_features !! need more training time
@@ -176,76 +178,77 @@ def load_model(use_self_trained_weight=False):
         predictions = Dense(1, activation='sigmoid')(x)        
         model = Model(inputs=base_model.input, outputs=predictions)
 
-        model_weight = g_model + "_" + top_model_weights_path
-        if use_self_trained_weight and os.path.isfile(model_weight):     
-            model.load_weights(model_weight)
+    model_weight = g_model + "_" + model_weights_path
+    if use_self_trained_weight and os.path.isfile(model_weight):     
+        model.load_weights(model_weight)
     return model, base_model
         
 ## train top layer
 def train_top_model():            
-    if g_model == MODEL_VGG:  
+    # if g_model == MODEL_VGG:  
         # get features from frozen conv part  
-        start_time = time.time()
-        save_bottlebeck_features()
-        print(time.time() - start_time, "seconds")
+        # start_time = time.time()
+        # save_bottlebeck_features()
+        # print(time.time() - start_time, "seconds")
 
-        train_data = np.load(full_train_feature)
-        train_df = output_dataframe(train_dir) # pandas
-        # train_df.head()    
-        # train_df.label.value_counts()               
-        len_ = (len(train_df.label.values)//batch_size)*batch_size
-        train_labels = train_df.label.values[:len_]  
+        # train_data = np.load(full_train_feature)
+        # train_df = output_dataframe(train_dir) # pandas
+        # # train_df.head()    
+        # # train_df.label.value_counts()               
+        # len_ = (len(train_df.label.values)//batch_size)*batch_size
+        # train_labels = train_df.label.values[:len_]  
         
-        validation_data = np.load(full_val_feature)         
-        val_df = output_dataframe(val_dir)       
-        len_ = (len(val_df.label.values)//batch_size)*batch_size
-        validation_labels = val_df.label.values[:len_]                  
+        # validation_data = np.load(full_val_feature)         
+        # val_df = output_dataframe(val_dir)       
+        # len_ = (len(val_df.label.values)//batch_size)*batch_size
+        # validation_labels = val_df.label.values[:len_]                  
 
-        model = Sequential()
-        model.add(Flatten(input_shape=train_data.shape[1:]))
-        model.add(Dense(256, activation='relu'))
-        model.add(Dropout(0.5))
-        model.add(Dense(1, activation='sigmoid'))
-    elif g_model == MODEL_RESNET:
-        model, base_model = load_model()
-        
-        # first: train only the top layers (which were randomly initialized)
-        # i.e. freeze all convolutional InceptionV3 layers
-        for layer in base_model.layers:
-            layer.trainable = False
-        
-        # TODO: add data augmentation
-        train_datagen = ImageDataGenerator(rescale=1. / 255)
-        train_generator = train_datagen.flow_from_directory(
-            train_dir,
-            target_size=(img_height, img_width),
-            batch_size=batch_size,
-            class_mode='binary') # shuffle is default True
-        validation_datagen = ImageDataGenerator(rescale=1. / 255)
-        validation_generator = validation_datagen.flow_from_directory(
-            val_dir,
-            target_size=(img_height, img_width),
-            batch_size=batch_size,
-            class_mode='binary')        
+        # model = Sequential()
+        # model.add(Flatten(input_shape=train_data.shape[1:]))
+        # model.add(Dense(256, activation='relu'))
+        # model.add(Dropout(0.5))
+        # model.add(Dense(1, activation='sigmoid'))
+    # elif g_model == MODEL_RESNET:
+
+    model, base_model = load_model()
+    
+    # first: train only the top layers (which were randomly initialized)
+    # i.e. freeze all convolutional InceptionV3 layers
+    for layer in base_model.layers:
+        layer.trainable = False
+    
+    # TODO: add data augmentation
+    train_datagen = ImageDataGenerator(rescale=1. / 255)
+    train_generator = train_datagen.flow_from_directory(
+        train_dir,
+        target_size=(img_height, img_width),
+        batch_size=batch_size,
+        class_mode='binary') # shuffle is default True
+    validation_datagen = ImageDataGenerator(rescale=1. / 255)
+    validation_generator = validation_datagen.flow_from_directory(
+        val_dir,
+        target_size=(img_height, img_width),
+        batch_size=batch_size,
+        class_mode='binary')        
 
     model.compile(optimizer='rmsprop',
                   loss='binary_crossentropy', metrics=['accuracy'])
 
-    if g_model == MODEL_VGG:     
-        train_history = model.fit(train_data, train_labels,
-                epochs=epochs,
-                batch_size=batch_size,
-                validation_data=(validation_data, validation_labels))              
-    elif g_model == MODEL_RESNET:
-        train_history = model.fit_generator(
-            train_generator,
-            steps_per_epoch=nb_train_samples // batch_size,
-            epochs=epochs,
-            validation_data=validation_generator,
-            validation_steps=nb_validation_samples // batch_size,
-            verbose=2)        
-
-    model.save_weights(g_model + "_" + top_model_weights_path)
+    # if g_model == MODEL_VGG:     
+    #     train_history = model.fit(train_data, train_labels,
+    #             epochs=epochs,
+    #             batch_size=batch_size,
+    #             validation_data=(validation_data, validation_labels))              
+    #     model.save_weights(g_model + "_" + top_model_weights_path)
+    # elif g_model == MODEL_RESNET:
+    train_history = model.fit_generator(
+        train_generator,
+        steps_per_epoch=nb_train_samples // batch_size,
+        epochs=epochs,
+        validation_data=validation_generator,
+        validation_steps=nb_validation_samples // batch_size,
+        verbose=2)        
+    model.save_weights(g_model + "_" + model_weights_path)
 
     from utility import show_train_history
     show_train_history(train_history,'acc','val_acc')     
@@ -268,10 +271,11 @@ def evaluate_model():
 def main():
     # explore_image()   
 
+    global g_model 
+    g_model = MODEL_VGG
+
     train_top_model() # using matplotlib to plot
 
-    # global g_model 
-    # g_model = MODEL_VGG
     evaluate_model()
 
 if __name__ == '__main__':
