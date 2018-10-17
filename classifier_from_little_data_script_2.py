@@ -93,7 +93,11 @@ def train_top_model():
     model = Sequential()
     model.add(Flatten(input_shape=train_data.shape[1:]))
     model.add(Dense(256, activation='relu'))
-    model.add(Dropout(0.5))
+    
+    # or use ordinary vgg16's relu layer instead of dropout here, 
+    # #like https://github.com/anujshah1003/Transfer-Learning-in-keras---custom-data/blob/master/transfer_learning_vgg16_custom_data.py
+    model.add(Dropout(0.5)) 
+    
     model.add(Dense(1, activation='sigmoid'))
 
     model.compile(optimizer='rmsprop',
