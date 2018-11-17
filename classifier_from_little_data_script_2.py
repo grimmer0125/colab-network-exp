@@ -93,9 +93,15 @@ def train_top_model():
     model = Sequential()
     model.add(Flatten(input_shape=train_data.shape[1:]))
     model.add(Dense(256, activation='relu'))
-    model.add(Dropout(0.5))
+    
+    # or use ordinary vgg16's relu layer instead of dropout here, 
+    # #like https://github.com/anujshah1003/Transfer-Learning-in-keras---custom-data/blob/master/transfer_learning_vgg16_custom_data.py
+    model.add(Dropout(0.5)) 
+    
     model.add(Dense(1, activation='sigmoid'))
 
+    # https://stackoverflow.com/questions/48280873/what-is-the-difference-between-loss-function-and-metric-in-keras
+    # metrics is not for optimizing process, just for validation/test  
     model.compile(optimizer='rmsprop',
                   loss='binary_crossentropy', metrics=['accuracy'])
 
@@ -109,7 +115,7 @@ def train_top_model():
          
     model.save_weights(top_model_weights_path)
 
-def predict():
+def predict(file):
     # from keras.applications.vgg16 import preprocess_input, decode_predictions
 
     # copy from classifier_from_little_data_script_3
@@ -127,7 +133,7 @@ def predict():
 
     # 10.jpg # cat
     # 132.jpg # dog
-    img = image.load_img('test_dog_132.jpg', target_size=(img_width, img_height))
+    img = image.load_img(file, target_size=(img_width, img_height))
     x = image.img_to_array(img)  # 150, 150, 3 (ndarray)
     x = np.expand_dims(x, axis=0) # 1, 150, 150, 3
 
@@ -136,10 +142,29 @@ def predict():
     probs = model.predict(x) 
     print("get prediction:{}".format(probs))
 
+def read_test_folder_predict():
+    import os
+    test_data_dir_cat = 'data/test/cats'
+    test_data_dir_dog = 'data/test/dogs'
+    cats = os.listdir(test_data_dir_cat)
+    # ref ( <0.5 counts first class in binary classification)
+    # https://stats.stackexchange.com/questions/207049/neural-network-for-binary-classification-use-1-or-2-output-neurons
+    # https://datascience.stackexchange.com/questions/14415/how-does-keras-calculate-accuracy
+    # https://stackoverflow.com/questions/47508874/how-does-keras-evaluate-the-accuracy
+    for cat in cats:
+        predict(test_data_dir_cat+"/"+cat)
+        # most of them are 0, few are 1 and ever get prediction:[[5.099429e-13]]
+    dogs = os.listdir(test_data_dir_dog)
+    for dog in dogs:
+        predict(test_data_dir_dog+"/"+dog)
+
+    
+
 def main():
     # save_bottleneck_features()
-    train_top_model()
+    # train_top_model()
     # predict()
+    read_test_folder_predict()
     print("done")    
 
 if __name__ == '__main__':

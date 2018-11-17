@@ -122,7 +122,7 @@ def evaluate_model():
                 optimizer=optimizers.SGD(lr=1e-4, momentum=0.9),
                 metrics=['accuracy'])    
     scores = model.evaluate_generator(generator, nb_test_samples // batch_size)
-    print(scores[1]) # [0.32, 0.935] loss, acc
+    print(scores[1]) # 0.32. scores: [0.32, 0.935] loss, acc
 
 def main():
     print("start") 
