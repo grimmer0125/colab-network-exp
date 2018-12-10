@@ -43,7 +43,7 @@ fine_tune_model ()
 
 step1: upload and setup your private ssl key on colab, follow https://stackoverflow.com/a/49933595/7354486, summary
 1. `! ssh-keyscan gitlab.com >> /root/.ssh/known_hosts` or `! ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts`, then `! chmod 644 /root/.ssh/known_hosts`. Use `!ssh -T hg@bitbucket.org` to test if it is ok or not.
-2. upload `KEY_FILE_NAME` using `uploaded = files.upload(), then `!chmod 600 KEY_FILE_NAME`,  ~and move it to `~/.ssh`~  
+2. upload `KEY_FILE_NAME` using `uploaded = files.upload()`, then `!chmod 600 KEY_FILE_NAME` 
 
 step2: setup your public ssl key
 
