@@ -42,8 +42,9 @@ fine_tune_model ()
 ### How to clone your git private repository from GitLab or Bitbucket
 
 step1: upload and setup your private ssl key on colab, follow https://stackoverflow.com/a/49933595/7354486, summary
-1. `! ssh-keyscan gitlab.com >> /root/.ssh/known_hosts` or `! ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts`, then `! chmod 644 /root/.ssh/known_hosts`. Use `!ssh -T hg@bitbucket.org` to test if it is ok or not.
-2. upload `KEY_FILE_NAME` using `uploaded = files.upload()`, then `!chmod 600 KEY_FILE_NAME` 
+1. mkdir -p /root/.ssh
+2. `! ssh-keyscan gitlab.com >> /root/.ssh/known_hosts` or `! ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts`. Use `!ssh -T hg@bitbucket.org` to test if it is ok or not.
+3. upload `KEY_FILE_NAME` using `uploaded = files.upload()`, then `!chmod 600 KEY_FILE_NAME` 
 
 step2: setup your public ssl key
 
