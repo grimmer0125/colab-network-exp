@@ -4,7 +4,7 @@ ref: https://medium.com/deep-learning-turkey/google-colab-free-gpu-tutorial-e113
 
 ### mount google drive in colab VM
 
-p.s. this mounting may be accesable by other session but is has expirtation time
+p.s. this mounting may be accessible by other session but is has expiration time
 
 ```
 from google.colab import drive
@@ -42,14 +42,16 @@ fine_tune_model ()
 ### How to clone your git private repository from GitLab or Bitbucket
 
 step1: upload and setup your private ssl key on colab, follow https://stackoverflow.com/a/49933595/7354486, summary
-1. upload using `uploaded = files.upload()` and move it to `~/.ssh` and `!chmod 600 /root/.ssh/id_rsa`
-2. `! ssh-keyscan gitlab.com >> /root/.ssh/known_hosts` or `! ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts`, then `! chmod 644 /root/.ssh/known_hosts`
+1. `! ssh-keyscan gitlab.com >> /root/.ssh/known_hosts` or `! ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts`, then `! chmod 644 /root/.ssh/known_hosts`. Use `!ssh -T hg@bitbucket.org` to test if it is ok or not.
+2. upload `KEY_FILE_NAME` using `uploaded = files.upload(), then `!chmod 600 KEY_FILE_NAME`,  ~and move it to `~/.ssh`~  
 
-step2: setup your public ssl key 
+step2: setup your public ssl key
 
-- GitLab: Settings > Repository section by expanding the Deploy Key)
+- GitLab: Settings > Repository section by expanding the Deploy Key
 - Bitbucket: Settings->Access keys
 
-Use `!ssh -T hg@bitbucket.org` to test if it is ok or not. Then you can use `git clone git@` to download your code.
+step3:
 
-p.s. after testing for Bitbucket, the private key file should be located "~/.ssh/id_rsa" on colab, then it works. Somehow other name does not work. 
+Then you can use `!GIT_SSH_COMMAND="ssh -i KEY_FILE_NAME -F /dev/null" git clone git@gitlab.com:USER_NAME/REPO_NAME.git` to download your code.
+
+~p.s. after testing for Bitbucket, the private key file should be located "~/.ssh/id_rsa" on colab, then it works. Somehow other name does not work.~ 
