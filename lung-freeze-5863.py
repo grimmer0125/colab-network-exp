@@ -9,6 +9,7 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.preprocessing.image import load_img,img_to_array
 from keras import optimizers
 
+
 import numpy as np 
 # pandas is for 
 # 1. group label from folder (= using flow_from_directory+class_mode='binary')
@@ -161,6 +162,7 @@ def load_model(use_self_trained_weight=False):
             top_model.load_weights(full_top_model_weight)
 
         model = Model(inputs=base_model.input, outputs=top_model(base_model.output))  
+        print(model.summary())
     elif g_model == MODEL_RESNET:
         # TODO: add resnet 
         # no use save_bottlebeck_features !! need more training time
@@ -268,15 +270,52 @@ def evaluate_model():
     print("loss:{}".format(scores[0])) # 
     print("acc:{}".format(scores[1])) # 
 
+def predict(file):
+    # datagen = ImageDataGenerator(rescale=1. / 255)
+    # generator = datagen.flow_from_directory(
+    #     test_dir,
+    #     target_size=(img_width, img_height),
+    #     batch_size=batch_size,
+    #     class_mode='binary')
+    model, _ = load_model(use_self_trained_weight=True)
+    # model.compile(optimizer='rmsprop',
+    #               loss='binary_crossentropy', metrics=['accuracy'])
+    # scores = model.evaluate_generator(generator, nb_test_samples // batch_size)
+    # print("loss:{}".format(scores[0])) # 
+    # print("acc:{}".format(scores[1])) #
+
+    img = load_img(file, target_size=(img_width, img_height))
+    x = img_to_array(img)  # 150, 150, 3 (ndarray)
+    x = np.expand_dims(x, axis=0) # 1, 150, 150, 3
+    probs = model.predict(x) 
+    print("get prediction:{}".format(probs))    
+
 def main():
     # explore_image()   
 
     global g_model 
     g_model = MODEL_VGG
 
-    train_top_model() # using matplotlib to plot
+    a = "NORMAL/IM-0030-0001.jpeg" # 1
+    a1 = "NORMAL/IM-0061-0001.jpeg" # 0
+    a2 = "NORMAL/IM-0097-0001.jpeg" # 0
+    a3 = "NORMAL/NORMAL2-IM-0073-0001.jpeg" # 1
+    a4 = "NORMAL/NORMAL2-IM-0135-0001.jpeg" # 1
 
-    evaluate_model()
+    tt = './chest_xray/test/'
+
+    b = "PNEUMONIA/person16_virus_47.jpeg" # 1
+    b1 = "PNEUMONIA/person102_bacteria_487.jpeg" # 1
+    b2 = "PNEUMONIA/person133_bacteria_633.jpeg" # 1
+    b3 = "PNEUMONIA/person1613_virus_2799.jpeg" # 1
+    b4 = "PNEUMONIA/person1717_bacteria_4534.jpeg" # 1
+
+    tt2 = './chest_xray/test/'
+
+    predict(tt2+b4)
+
+    # train_top_model() # using matplotlib to plot
+    # evaluate_model()
 
 if __name__ == '__main__':
     try:
