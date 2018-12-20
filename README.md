@@ -2,7 +2,7 @@
 
 ref: https://medium.com/deep-learning-turkey/google-colab-free-gpu-tutorial-e113627b9f5d
 
-### mount google drive in colab VM
+### mount google drive in colab VM and download public git repo code
 
 p.s. this mounting may be accessible by other session but is has expiration time
 
@@ -41,18 +41,50 @@ fine_tune_model ()
 ```
 ### How to clone your git private repository from GitLab or Bitbucket
 
-step1: upload and setup your private ssl key on colab, follow https://stackoverflow.com/a/49933595/7354486, summary
-1. mkdir -p /root/.ssh
-2. `! ssh-keyscan gitlab.com >> /root/.ssh/known_hosts` or `! ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts`. Use `!ssh -T hg@bitbucket.org` to test if it is ok or not.
-3. upload `KEY_FILE_NAME` using `uploaded = files.upload()`, then `!chmod 600 KEY_FILE_NAME` 
+#### Step1: Generate a ssh key pair locally
 
-step2: setup your public ssl key
+Follow the guide: https://docs.gitlab.com/ee/ssh/. Assume `KEY_FILE_NAME` is the private key file name.
+
+#### step2: setup your public ssl key on GitLab or bitbucket
 
 - GitLab: Settings > Repository section by expanding the Deploy Key
 - Bitbucket: Settings->Access keys
 
-step3:
+#### Step3: Prepare to git clone on colab 
 
-Then you can use `!GIT_SSH_COMMAND="ssh -i KEY_FILE_NAME -F /dev/null" git clone git@gitlab.com:USER_NAME/REPO_NAME.git` to download your code.
+**3-1: setup ssh hosts**
 
-~p.s. after testing for Bitbucket, the private key file should be located "~/.ssh/id_rsa" on colab, then it works. Somehow other name does not work.~ 
+create the folder 
+
+```
+cd /root
+mkdir .ssh
+```
+
+For Gitlab:
+
+```
+! ssh-keyscan gitlab.com >> /root/.ssh/known_hosts 
+```
+
+For Bicbucket:
+
+`! ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts`
+
+Use `!ssh -T hg@gitlab.com` to test if it is ok or not.
+
+**3-2: Upload the ssh private key to colab**
+
+Either use Google drive to upload ssh private key file to the mounted colab folder or using `uploaded = files.upload()` on colab.
+
+Then `!chmod 600 KEY_FILE_NAME`
+
+#### Step4: Use Git command to download the code on colab
+
+`!GIT_SSH_COMMAND="ssh -i KEY_FILE_NAME -F /dev/null" git clone git@gitlab.com:USER_NAME/REPO_NAME.git`
+
+#### Step5: Use Git command to update code on colab
+
+cd /content/drive/My\ Drive/Colab\ Notebooks/YOUR_GIT_PROJECT
+!GIT_SSH_COMMAND="ssh -i ../id_ed25519 -F /dev/null" git fetch --all
+!GIT_SSH_COMMAND="ssh -i ../id_ed25519 -F /dev/null" git reset --hard origin/develop
